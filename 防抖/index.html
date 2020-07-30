@@ -1,0 +1,95 @@
+<!--
+ * @Description: 短时间内多次触发同一事件，只执行最后一次，或者只执行最开始的一次，中间的不执行。
+ * @Autor: 吕殿朝
+ * @Date: 2020-07-29 10:34:48
+ * @LastEditors: 吕殿朝
+ * @LastEditTime: 2020-07-30 14:46:21
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=script, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="content"
+    style="height:150px;line-height:150px;text-align:center; color: #fff;background-color:#ccc;font-size:80px;"></div>
+  <script>
+    window.onload = function () {
+      let num = 1;
+      let content = document.getElementById('content');
+
+      function count() {
+        content.innerHTML = num++;
+      };
+      // content.onmousemove = debounce(count, 500);
+      //content.onmousemove = debounce2(count, 500);
+      content.onmousemove = debounce3(count, 500, false);
+      //非立即执行版的意思是触发事件后函数不会立即执行，而是在 n 秒后执行，如果在 n 秒内又触发了事件，则会重新计算函数执行时间。
+      //防抖  延时执行
+      function debounce(func, wait) {
+        let timer;
+        return function () {
+          let context = this; //this指向
+          let args = arguments; //arguments中存储e
+          if (timer) {
+            clearTimeout(timer)
+          }
+          timer = setTimeout(() => {
+            func.apply(this, args)
+          }, wait);
+        }
+      }
+      //立即执行
+      //立即执行版的意思是触发事件后函数会立即执行，然后 n 秒内不触发事件才能继续执行函数的效果。
+      function debounce2(func, wait) {
+        let timer;
+        return function () {
+          let context = this;
+          let args = arguments;
+          if (timer) clearTimeout(timer);
+          let callNow = !timer;
+
+          timer = setTimeout(() => {
+            timer = null
+          }, wait);
+
+          if (callNow) func.apply(context, args)
+        }
+      }
+      /**
+       * @description: 函数防抖 合并版
+       * @param func 目标函数
+       * @param wait 延时执行毫秒
+       * @param immediate true - 立即执行， false - 延迟执行
+       * @return: 
+       * @author: 吕殿朝
+       */
+      function debounce3(func, wait, immediate) {
+        let timer;
+        return function () {
+          let context = this,
+            args = arguments;
+          if (timer) clearTimeout(timer)
+          if (immediate) {
+            let callNow = !timer;
+            timer = setTimeout(() => {
+              timer = null;
+            }, wait);
+            if (callNow) func.apply(context, args)
+          } else {
+            timer = setTimeout(() => {
+              func.apply(this, args)
+            }, wait);
+          }
+        }
+      }
+
+    }
+  </script>
+</body>
+
+</html>
